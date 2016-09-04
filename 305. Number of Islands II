@@ -1,0 +1,102 @@
+/*
+A 2d grid map of m rows and n columns is initially filled with water. We may perform an addLand operation which turns the water at position (row, col) into a land. Given a list of positions to operate, count the number of islands after each addLand operation. An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+
+Example:
+
+Given m = 3, n = 3, positions = [[0,0], [0,1], [1,2], [2,1]].
+Initially, the 2d grid grid is filled with water. (Assume 0 represents water and 1 represents land).
+
+0 0 0
+0 0 0
+0 0 0
+Operation #1: addLand(0, 0) turns the water at grid[0][0] into a land.
+
+1 0 0
+0 0 0   Number of islands = 1
+0 0 0
+Operation #2: addLand(0, 1) turns the water at grid[0][1] into a land.
+
+1 1 0
+0 0 0   Number of islands = 1
+0 0 0
+Operation #3: addLand(1, 2) turns the water 
+*/
+class Solution {
+public:
+    vector<int> numIslands2(int m, int n, vector<pair<int, int>>& positions) {
+        int cur=0;
+        vector<vector<int>> water(m,vector<int>(n));
+        vector<vector<int>> size(m,vector<int>(n));
+        //memset(&water,0,sizeof(water));
+        vector<int> res;
+        for(auto pos:positions){
+            vector<int> record(4,0);
+            if(pos.first+1<m){
+                if(water[pos.first+1][pos.second]>0){
+                    pair<int,int> temp={pos.first+1,pos.second};
+                    while(water[temp.first][temp.second]!=temp.first*n+temp.second+1){
+                        int t=water[temp.first][temp.second];
+                        water[temp.first][temp.second]=water[(t-1)/n][(t-1)%n];
+                        t=water[temp.first][temp.second];
+                        temp={(t-1)/n,(t-1)%n};
+                    }
+                    record[0]=temp.first*n+temp.second+1;
+                }
+            }
+            if(pos.first-1>=0){
+                if(water[pos.first-1][pos.second]>0){
+                    pair<int,int> temp={pos.first-1,pos.second};
+                    while(water[temp.first][temp.second]!=temp.first*n+temp.second+1){
+                        int t=water[temp.first][temp.second];
+                        water[temp.first][temp.second]=water[(t-1)/n][(t-1)%n];
+                        t=water[temp.first][temp.second];
+                        temp={(t-1)/n,(t-1)%n};
+                    }
+                    record[1]=temp.first*n+temp.second+1;
+                }
+            }
+            if(pos.second+1<n){
+                if(water[pos.first][pos.second+1]>0){
+                    pair<int,int> temp={pos.first,pos.second+1};
+                    while(water[temp.first][temp.second]!=temp.first*n+temp.second+1){
+                        int t=water[temp.first][temp.second];
+                        water[temp.first][temp.second]=water[(t-1)/n][(t-1)%n];
+                        t=water[temp.first][temp.second];
+                        temp={(t-1)/n,(t-1)%n};
+                    }
+                    record[2]=temp.first*n+temp.second+1;
+                }
+            }
+            if(pos.second-1>=0){
+                if(water[pos.first][pos.second-1]>0){
+                    pair<int,int> temp={pos.first,pos.second-1};
+                    while(water[temp.first][temp.second]!=temp.first*n+temp.second+1){
+                        int t=water[temp.first][temp.second];
+                        water[temp.first][temp.second]=water[(t-1)/n][(t-1)%n];
+                        t=water[temp.first][temp.second];
+                        temp={(t-1)/n,(t-1)%n};
+                    }
+                    record[3]=temp.first*n+temp.second+1;
+                }
+            }
+            sort(record.begin(),record.end());
+            if(record[3]==0) {cur++;water[pos.first][pos.second]=pos.first*n+pos.second+1;res.push_back(cur);continue;}
+            for(int i=0;i<3;i++){
+                if(record[i]==0 or record[i]==record[i+1]) continue;
+                    if(size[(record[i]-1)/n][(record[i]-1)%n]>size[(record[i+1]-1)/n][(record[i+1]-1)%n]){
+                        water[(record[i+1]-1)/n][(record[i+1]-1)%n]=water[(record[i]-1)/n][(record[i]-1)%n];
+                        size[(record[i]-1)/n][(record[i]-1)%n]+=size[(record[i+1]-1)/n][(record[i+1]-1)%n];
+                    }
+                    else{
+                        water[(record[i]-1)/n][(record[i]-1)%n]= water[(record[i+1]-1)/n][(record[i+1]-1)%n];
+                        size[(record[i+1]-1)/n][(record[i+1]-1)%n]=size[(record[i]-1)/n][(record[i]-1)%n];
+                    }
+                    cur--;
+            }
+            
+            water[pos.first][pos.second]=record[3];
+            res.push_back(cur);
+        }
+        return res;
+    }
+};
