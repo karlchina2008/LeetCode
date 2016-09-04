@@ -10,57 +10,36 @@ Assume that the BST is balanced, could you solve it in less than O(n) runtime (w
 */
 class Solution {
 public:
+    // brute force solution 
+    // space complexity deque: O(K) ; stack: O(logN) stack; for stack part, we can remove it by morris traversal  
+    // time complexity O(N)
     vector<int> closestKValues(TreeNode* root, double target, int k) {
-        list<pair<int,double>> record;
-        record=help(root,target);
-        vector<int> res;
-        int i=0;
-        for(auto it:record){
-            res.push_back(it.first);
-            if(++i==k) break;
-        }
-        return res;
-    }
-    list<pair<int,double>> help(TreeNode* root,double &target){
-        list<pair<int,double>> cur;
-        if(!root) return cur;
-        double res=abs(double(root->val)-target);
-        list<pair<int,double>> left,right;
-        left=help(root->left,target);right=help(root->right,target);
-        if(root->val<target){
-            if(right.empty()) {left.push_front({root->val,res});return left;}
-            else{
-                auto it=lower_bound(right.begin(),right.end(),res,[](pair<int,double> b,double a){return a>b.second;});
-                right.insert(it,{root->val,res});
-                auto it_left=left.begin();
-                while(it!=right.end() and it_left!=left.end()){
-                    if(it->second<=it_left->second) it++;
-                    else{
-                        right.insert(it,*it_left);
-                        it_left++;
-                    }
+        if (root == NULL || k <= 0) { return vector<int>(); }
+        deque<int> myQ; 
+        stack<TreeNode *> ss; // use stack to do in-order search 
+        while (root || !ss.empty()) {
+            while(root) {
+                ss.push(root);
+                root = root->left;
+            } 
+            root = ss.top();
+            ss.pop();
+            // let's process root now
+            if (myQ.size() < k) {
+                myQ.push_back(root->val);
+            } else { // size == k, 
+                // if root->val is too small, update queue; otherwise, compare with queue's front
+                if (target > root->val || (abs(target - root->val) < abs(target - myQ.front()))) {
+                    myQ.push_back(root->val);
+                    myQ.pop_front();
+                } else {  
+                    break; 
                 }
-                while(it_left!=left.end()) {right.insert(it,*it_left);it_left++;}
-                return right;
             }
+            // move to next one 
+            root = root->right;
         }
-        else{
-            if(left.empty()) {right.push_front({root->val,res}); return right;}
-            else{
-                auto it=lower_bound(left.begin(),left.end(),res,[](pair<int,double> b,double a){return a>b.second;});
-                left.insert(it,{root->val,res});
-                auto it_right=right.begin();
-                while(it!=left.end() and it_right!=right.end()){
-                    if(it->second<=it_right->second) it++;
-                    else{
-                        left.insert(it,*it_right);
-                        it_right++;
-                    }
-                }
-                while(it_right!=right.end()) {left.insert(it,*it_right);it_right++;}
-                return left;
-            }
-        }
-        return cur;
+        return vector<int>(myQ.begin(), myQ.end());
     }
 };
+
