@@ -9,45 +9,19 @@ Given n = 2, return ["11","69","88","96"].
 class Solution {
 public:
     vector<string> findStrobogrammatic(int n) {
-        string gram="01869";
-        unordered_map<char,char> mymap={{'0','0'},{'1','1'},{'8','8'},{'6','9'},{'9','6'}};
-        vector<string> res;
-        int m=n/2;
-        help(res,gram,m,"");
-        if(n%2==0){
-            for(int i=0;i<res.size();i++){
-                string s=res[i];
-                for(int j=s.size()-1;j>=0;j--)
-                    res[i]+=mymap[s[j]];
-            }
-        }
-        else{
-            vector<string> res_1;
-            for(int i=0;i<res.size();i++){
-                string s;
-                for(int j=res[i].size()-1;j>=0;j--)
-                    s+=mymap[res[i][j]];
-                for(int j=0;j<3;j++){
-                    res_1.push_back(res[i]+gram[j]+s);
-                }
-            }
-            return res_1;
+        return helper(n , n);
+    }
+    vector<string> helper(int m, int n){
+        if(m == 0) return vector<string>({""});
+        if(m == 1) return vector<string>({"0", "1", "8"});
+        vector<string> tmp = helper(m - 2, n), res;
+        for(int i = 0; i < tmp.size(); i++){
+            if(m != n) res.push_back("0" + tmp[i] + "0");
+            res.push_back("1" + tmp[i] + "1");
+            res.push_back("6" + tmp[i] + "9");
+            res.push_back("8" + tmp[i] + "8");
+            res.push_back("9" + tmp[i] + "6");
         }
         return res;
-    }
-    
-    void help(vector<string> &res,string &gram,int &m,string temp){
-        if(temp.size()==m){
-            res.push_back(temp);
-            return;
-        }
-        int begin;
-        if(temp.empty()) begin=1;
-        else begin=0;
-        for(int i=begin;i<5;i++){
-            temp.push_back(gram[i]);
-            help(res,gram,m,temp);
-            temp.pop_back();
-        }
     }
 };
