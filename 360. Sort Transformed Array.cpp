@@ -6,44 +6,38 @@ The returned array must be in sorted order.
 Expected time complexity: O(n)
 */
 class Solution {
-public:
-    vector<int> sortTransformedArray(vector<int>& nums, int a, int b, int c) {
-        vector<int> res;
-        if(a==0){
-            if(b>0){
-                for(int i=0;i<nums.size();i++)
-                    res.push_back(b*nums[i]+c);
-            }
-            else{
-                for(int i=nums.size()-1;i>=0;i--)
-                    res.push_back(b*nums[i]+c);
+    public:
+        vector<int> sortTransformedArray(vector<int>& nums, int a, int b, int c) {
+            vector<int> res(nums.size());
+            if (nums.size() == 0) return res;
+            int i = 0, j = nums.size() - 1;
+            if (a > 0) {
+                int index = nums.size() - 1;
+                while (i <= j) {
+                    if (transform(nums[i], a, b, c) > transform(nums[j], a, b, c)) {
+                        res[index--] = transform(nums[i], a, b, c);
+                        i++;
+                    } else {
+                        res[index--] = transform(nums[j], a, b, c);
+                        j--;
+                    }
+                }
+            } else {
+                int index = 0;
+                while (i <= j) {
+                    if (transform(nums[i], a, b, c) < transform(nums[j], a, b, c)) {
+                        res[index++] = transform(nums[i], a, b, c);
+                        i++;
+                    } else {
+                        res[index++] = transform(nums[j], a, b, c);
+                        j--;
+                    }
+                }
             }
             return res;
         }
-        int mid=floor(-(float(b)/2/float(a)));
-        auto it=upper_bound(nums.begin(),nums.end(),mid);
-        vector<int> left,right;
-        for(auto temp=nums.begin();temp!=it;temp++){
-            int x=(*temp);
-            left.push_back(a*x*x+b*x+c);
+
+        int transform(int num, int a, int b, int c) {
+            return a * num * num + b * num + c;
         }
-        for(auto temp=it;temp!=nums.end();temp++){
-            int x=(*temp);
-            right.push_back(a*x*x+b*x+c);
-        }
-        if(a<0)
-            reverse(right.begin(),right.end());//not necessary;
-        else
-            reverse(left.begin(),left.end());
-        int i=0,j=0;
-        while(i<left.size() and j<right.size()){
-            if((left[i]<=right[j])) res.push_back(left[i++]);
-            else res.push_back(right[j++]);
-            //cout<<res.back()<<endl;
-        }
-        while(i<left.size()) res.push_back(left[i++]);
-        while(j<right.size()) res.push_back(right[j++]);
-        return res;
-        
-    }
 };
