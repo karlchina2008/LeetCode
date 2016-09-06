@@ -18,12 +18,10 @@ public:
             while(i<words.size()){
                 size+=words[i].size();
                 count++;
-                //cout<<size+count-1<<" "<<words[i]<<endl;
                 if(size+count-1<=maxWidth)
                     i++;
                 else{
                     int l=maxWidth-(size-words[i].size()+count-2);
-                    //cout<<l<<" "<<words[i-1]<<" "<<count<<endl;
                     string temp=transfer(words,left,i,l);
                     res.push_back(temp);
                     break;
